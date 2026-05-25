@@ -214,7 +214,8 @@
     }
 
     #vega-container {
-      flex: 1;
-      padding: 20px;
-      overflow: auto;
+        flex: 1;
+        padding: 20px;
+        overflow-x: auto;
+        overflow-y: visible;
     }

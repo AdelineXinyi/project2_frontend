@@ -195,31 +195,47 @@ createApp({
         filterValues.value.map(v => String(v))
       )
 
-      spec.data.values = spec.data.values.filter(
-        row => selected.has(String(row[filterField.value]))
-      )
-
-      return spec
+      return {
+        ...spec,
+        data: {
+          ...spec.data,
+          values: spec.data.values.filter(
+            row => selected.has(String(row[filterField.value]))
+          )
+        }
+      }
     }
 
     function renderVega(rawSpec) {
-      const el = document.getElementById("vega-container")
-      if (!el) return
+        const el = document.getElementById("vega-container")
+        if (!el) return
 
-      const spec = JSON.parse(JSON.stringify(rawSpec))
-      const width = Math.max(el.clientWidth - 40, 300)
+        const spec = JSON.parse(JSON.stringify(rawSpec))
 
-      const selected = addSelection(spec)
-      const filtered = applyDropdownFilter(selected)
+        const selected = addSelection(spec)
+        const filtered = applyDropdownFilter(selected)
 
-      vegaEmbed("#vega-container", { ...filtered, width, autosize: "fit" }, {
-        actions: {
-          export: true,
-          source: false,
-          compiled: false,
-          editor: false
-        }
-      })
+        const valueCount = filtered?.data?.values?.length || 0
+
+        // If there are many categories, keep chart readable but not wider than container.
+        const width = Math.max(el.clientWidth - 40, 300)
+
+        // Make Vega-Lite fit the visible panel instead of creating a huge horizontal chart.
+        vegaEmbed("#vega-container", {
+            ...filtered,
+            width,
+            autosize: {
+            type: "fit",
+            contains: "padding"
+            }
+        }, {
+            actions: {
+            export: true,
+            source: false,
+            compiled: false,
+            editor: false
+            }
+        })
     }
 
     function rerenderCurrentSpec() {
