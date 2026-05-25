@@ -3,206 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SciSciNet — UMich Research Explorer</title>
+  <title>SciSciNet — UMich Research</title>
+
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f5;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      background: #00274c;
-      color: #fff;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-    }
-    header h1 { font-size: 18px; font-weight: 600; }
-    header span { font-size: 13px; opacity: 0.7; }
-
-    .app {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* ── Chat panel ── */
-    .chat-panel {
-      width: 380px;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      border-right: 1px solid #e0e0e0;
-    }
-
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .msg {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-width: 92%;
-    }
-    .msg.user { align-self: flex-end; }
-    .msg.bot  { align-self: flex-start; }
-
-    .bubble {
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .msg.user .bubble {
-      background: #00274c;
-      color: #fff;
-      border-bottom-right-radius: 4px;
-    }
-    .msg.bot .bubble {
-      background: #f0f0f0;
-      color: #222;
-      border-bottom-left-radius: 4px;
-    }
-    .msg.bot.loading .bubble {
-      color: #888;
-      font-style: italic;
-    }
-
-    .suggestions {
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      border-top: 1px solid #eee;
-    }
-    .suggestions p {
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 2px;
-    }
-    .suggestion-btn {
-      background: #f5f5f5;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 7px 12px;
-      font-size: 13px;
-      cursor: pointer;
-      text-align: left;
-      color: #333;
-      transition: background 0.15s;
-    }
-    .suggestion-btn:hover { background: #e8eef5; }
-
-    .input-row {
-      display: flex;
-      padding: 12px;
-      gap: 8px;
-      border-top: 1px solid #eee;
-    }
-    .input-row input {
-      flex: 1;
-      padding: 10px 14px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      font-size: 14px;
-      outline: none;
-    }
-    .input-row input:focus { border-color: #00274c; }
-    .input-row button {
-      background: #00274c;
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      padding: 10px 18px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    .input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* ── Viz panel ── */
-    .viz-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding: 24px;
-      gap: 16px;
-    }
-
-    .viz-placeholder {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
-      color: #aaa;
-      font-size: 15px;
-    }
-    .viz-placeholder svg { opacity: 0.3; }
-
-    .viz-card {
-      flex: 1;
-      background: #fff;
-      border-radius: 12px;
-      border: 1px solid #e0e0e0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .viz-card-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid #eee;
-      font-size: 13px;
-      color: #555;
-    }
-    #vega-container {
-      flex: 1;
-      padding: 20px;
-      overflow: auto;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 <div id="app">
   <header>
-    <div>
-      <h1>UMich Research Explorer</h1>
-      <span>SciSciNet · LLM-powered analysis</span>
-    </div>
+    <h1>UMich Research SciSciNet Analysis</h1>
   </header>
 
   <div class="app">
-    <!-- Chat -->
     <div class="chat-panel">
       <div class="messages" ref="messagesEl">
-        <div v-for="(m, i) in messages" :key="i" :class="['msg', m.role, m.loading ? 'loading' : '']">
+        <div
+          v-for="(m, i) in messages"
+          :key="i"
+          :class="['msg', m.role, m.loading ? 'loading' : '']"
+        >
           <div class="bubble">{{ m.text }}</div>
         </div>
       </div>
 
       <div class="suggestions">
         <p>Try asking:</p>
-        <button class="suggestion-btn" v-for="s in suggestions" :key="s" @click="sendSuggestion(s)">
+        <button
+          class="suggestion-btn"
+          v-for="s in suggestions"
+          :key="s"
+          @click="sendSuggestion(s)"
+        >
           {{ s }}
         </button>
       </div>
@@ -218,7 +54,6 @@
       </div>
     </div>
 
-    <!-- Viz -->
     <div class="viz-panel">
       <div v-if="!currentSpec" class="viz-placeholder">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -227,142 +62,44 @@
         </svg>
         <span>Ask a question to see a chart</span>
       </div>
+
       <div v-else class="viz-card">
-        <div class="viz-card-header">{{ currentSummary }}</div>
+        <div class="viz-card-header">
+          <div>{{ currentSummary }}</div>
+
+          <div v-if="filterOptions.length > 0" class="filter-row">
+            <div>
+              <label>Filter chart by {{ filterFieldLabel }}:</label>
+              <div class="filter-hint">Hold Cmd/Ctrl or Shift to select multiple values.</div>
+            </div>
+
+            <select
+              v-model="filterValues"
+              multiple
+              size="6"
+              @change="rerenderCurrentSpec"
+            >
+              <option
+                v-for="v in filterOptions"
+                :key="v"
+                :value="v"
+              >
+                {{ v }}
+              </option>
+            </select>
+
+            <button class="clear-filter-btn" @click="clearFilter">
+              Clear
+            </button>
+          </div>
+        </div>
+
         <div id="vega-container"></div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-const { createApp, ref, nextTick } = Vue
-
-const API = "http://localhost:8000"
-
-createApp({
-  setup() {
-    const messages       = ref([{ role: "bot", text: "Hi! Ask me anything about University of Michigan research. Try one of the suggestions below." }])
-    const inputText      = ref("")
-    const loading        = ref(false)
-    const currentSpec    = ref(null)
-    const currentSummary = ref("")
-    const messagesEl     = ref(null)
-
-    const suggestions = [
-      "Show me the number of papers by year",
-      "What are the top research fields?",
-      "Who are the most prolific authors?",
-      "Show citation statistics",
-    ]
-
-    async function send() {
-      const q = inputText.value.trim()
-      if (!q || loading.value) return
-
-      messages.value.push({ role: "user", text: q })
-      inputText.value = ""
-      loading.value   = true
-
-      const placeholder = { role: "bot", text: "Thinking…", loading: true }
-      messages.value.push(placeholder)
-      await scrollToBottom()
-
-      try {
-        const res  = await fetch(`${API}/chat`, {
-          method:  "POST",
-          headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ question: q }),
-        })
-        const data = await res.json()
-
-        placeholder.text    = data.summary
-        placeholder.loading = false
-
-        if (data.vega_spec && Object.keys(data.vega_spec).length > 0) {
-          currentSpec.value    = data.vega_spec
-          currentSummary.value = data.summary
-          await nextTick()
-          renderVega(data.vega_spec)
-        }
-      } catch (e) {
-        placeholder.text    = "Sorry, something went wrong. Is the backend running?"
-        placeholder.loading = false
-      }
-
-      loading.value = false
-      await scrollToBottom()
-    }
-
-    function sendSuggestion(s) {
-      inputText.value = s
-      send()
-    }
-
-    function addSelection(spec) {
-      // Determine the x field for selection
-      const xField = spec.encoding?.x?.field
-
-      // Add point selection param
-      spec.params = spec.params || []
-      const alreadyHasHighlight = spec.params.some(p => p.name === "highlight")
-      if (!alreadyHasHighlight && xField) {
-        spec.params.push({
-          name: "highlight",
-          select: { type: "point", fields: [xField] }
-        })
-      }
-
-      // Apply conditional color encoding
-      const mark = typeof spec.mark === "string" ? spec.mark : spec.mark?.type
-      if ((mark === "bar" || mark === "line" || mark === "point") && xField) {
-        if (!spec.encoding.color) {
-          spec.encoding.color = {
-            condition: { param: "highlight", value: "#00274c" },
-            value: "#cccccc"
-          }
-        } else if (!spec.encoding.color.condition) {
-          // preserve existing color scale but add condition
-          spec.encoding.color = {
-            condition: { param: "highlight", ...spec.encoding.color },
-            value: "#cccccc"
-          }
-        }
-      }
-
-      return spec
-    }
-
-    function renderVega(rawSpec) {
-      const el = document.getElementById("vega-container")
-      if (!el) return
-
-      // Deep clone to avoid mutating Vue reactive state
-      const spec  = JSON.parse(JSON.stringify(rawSpec))
-      const width = el.clientWidth - 40
-
-      // Inject selection interactivity
-      const enriched = addSelection(spec)
-
-      vegaEmbed("#vega-container", { ...enriched, width, autosize: "fit" }, {
-        actions: { export: true, source: false, compiled: false, editor: false }
-      })
-    }
-
-    async function scrollToBottom() {
-      await nextTick()
-      if (messagesEl.value)
-        messagesEl.value.scrollTop = messagesEl.value.scrollHeight
-    }
-
-    return {
-      messages, inputText, loading,
-      currentSpec, currentSummary,
-      suggestions, messagesEl,
-      send, sendSuggestion
-    }
-  }
-}).mount("#app")
-</script>
+<script src="app.js"></script>
 </body>
 </html>
